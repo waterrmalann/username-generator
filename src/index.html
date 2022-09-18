@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Username Generator</title>
+        
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="window-titlebar">
+                <div>
+                    <p>usernameGenerator.exe</p>
+                </div>
+                <div>
+                    <i class="fa fa-fw fa-xmark"></i>
+                </div>
+            </div>
+            <div class="window">
+                <div class="window__container">
+                    <div class="username-modal" id="usernameModal">
+                        <i id="usernameModalCloseButton" class="username-modal__close fa fa-fw fa-xmark"></i>
+                        <h2>Saved Usernames</h2>
+                        <ul id="usernameModalList"></ul>
+                    </div>
+                    <div class="window__toprow">
+                        <div class="card card-username">
+                            <div>
+                                <h1 id="usernameOutput">@username</h1>
+                            </div>
+                            <div>
+                                <i id="buttonClipboard" class="fa fa-thin fa-fw fa-paste"></i>
+                                <i id="buttonRegenerate" class="fa fa-thin fa-fw fa-arrow-rotate-right"></i>
+                                <i id="buttonHeart" class="fa fa-fw fa-heart"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="window__bottomrow">
+                        <div class="card">
+                            <h2 class="config-label">Customize</h2>
+                            <div class="toggle">
+                                <button id="togglePseudoword">Pseudoword</button>
+                                <button id="toggleMixword">Mixword</button>
+                            </div>
+
+                            <label><span id="sliderLengthDisplay">Length [9]</span>
+                                <input id="sliderLength" class="slider" type="range" min=3 max=15 value=9>
+                            </label>
+                            <label>
+                                <input class="checkbox" type="checkbox">Digits
+                            </label>
+                            <label>
+                                <input class="checkbox" type="checkbox">Adjectives
+                            </label>
+                            <select name="words" id="wordSelect">
+                                <option value="words">Nouns</option>
+                                <option value="colors">Colors</option>
+                                <option value="animals">Animals</option>
+                            </select>
+                        </div>
+                        <div class="card card-usernames">
+                            <ul id="usernameList">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p>by <a href="https://alanvarghese.me">&commat;waterrmalann</a>.</span> <a href="https://github.com/waterrmalann/username-generator">open-source</a>.</p>
+        </div>
+
+        <script src="js/gpw.js"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>
