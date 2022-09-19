@@ -17,6 +17,9 @@ const e_sliderLength = document.getElementById('sliderLength');
 const e_sliderLengthDisplay = document.getElementById('sliderLengthDisplay');
 const e_usernamesCard = document.getElementsByClassName('card-usernames')[0];
 
+const e_wordSelect = document.getElementById('wordSelect');
+const e_checkAdjectives = document.getElementById('checkAdjectives');
+
 const generationData = {
     adjectives: [],
     animals: [],
@@ -31,8 +34,21 @@ const generationData = {
  * @param  {Array} array Input array.
  * @return {any} Random item from the array.
  */
- function randomChoice(arr) {
+function randomChoice(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/**
+ * Joins an array into a string in camelCase.
+ * @param  {Array} arr Input array.
+ * @return {String} Returned value.
+ */
+function camelCaseJoin(arr) {
+    let _string = arr[0];
+    for (let i = 1; i < arr.length; i++) {
+        _string += arr[i].toUpperCase();
+    }
+    return _string;
 }
 
 /**
@@ -41,25 +57,35 @@ const generationData = {
  * @param {Boolean} camelCase Whether to camelCase the username.
  * @returns {String} Generated username.
  */
-function generateUsername(length, camelCase) {
+function generateMixwordUsername(length, camelCase) {
     let _username = [];
-    _username.push(randomChoice(generationData.adjectives));
+    if (e_checkAdjectives.checked) {
+        _username.push(randomChoice(generationData.adjectives));
+    }
     if (length > 2)
         _username.push(randomChoice(generationData.verbs));
     if (length > 1)
-        _username.push(randomChoice(generationData.nouns));
+        if (e_wordSelect.value === 'colors') {
+            _username.push(randomChoice(generationData.colors));
+        } else if (e_wordSelect.value === 'animals') {
+            _username.push(randomChoice(generationData.animals));
+        } else {
+            _username.push(randomChoice(generationData.nouns));
+        }
 
-    return _username.join('');
+    if (camelCase) {
+        return camelCaseJoin(_username);
+    } else {
+        return _username.join('');
+    }
 }
 
-function generatePseudousername(length) {
+function generatePseudowordUsername(length) {
     return GPW.pronounceable(length);
 }
 
-
-
 Promise.all([
-    fetch("/assets/data/adjectives.txt").then(x => x.text()),
+    fetch("./assets/data/adjectives.txt").then(x => x.text()),
     fetch("./assets/data/animals.txt").then(x => x.text()),
     fetch("./assets/data/colors.txt").then(x => x.text()),
     fetch("./assets/data/nouns.txt").then(x => x.text()),
@@ -130,15 +156,7 @@ e_sliderLength.addEventListener('input', () => {
 
 var currentGenerator = '';
 e_buttonRegenerate.addEventListener('click', () => {
-    let _username = '';
-    if (currentGenerator === 'pseudoword') {
-        _username = generatePseudousername(e_sliderLength.value);
-    }
-    else {
-        _username = generateUsername(e_sliderLength.value);
-    }
-    e_usernameOutput.innerText = '@' + _username;
-    generatedUsernames.push(_username);
+    generateUsername();
 });
 
 e_buttonClipboard.addEventListener('click', () => {
@@ -152,6 +170,18 @@ e_buttonClipboard.addEventListener('click', () => {
     document.body.removeChild(_dummy);
 });
 
+function generateUsername() {
+    let _username = '';
+    if (currentGenerator === 'pseudoword') {
+        _username = generatePseudowordUsername(e_sliderLength.value);
+    }
+    else {
+        _username = generateMixwordUsername(e_sliderLength.value);
+    }
+    e_usernameOutput.innerText = '@' + _username;
+    generatedUsernames.push(_username);
+}
+
 function toggleGenerator(gen) {
     currentGenerator = gen;
     if (currentGenerator === 'pseudoword') {
@@ -161,6 +191,8 @@ function toggleGenerator(gen) {
         e_sliderLength.min = 3;
         e_sliderLength.value = 8;
         e_sliderLengthDisplay.innerText = `Length [${e_sliderLength.value}]`;
+
+        e_wordSelect.style.visibility = 'hidden';
     }
     else {
         e_toggleMixword.classList.add('toggle-active');
@@ -169,7 +201,10 @@ function toggleGenerator(gen) {
         e_sliderLength.min = 2;
         e_sliderLength.value = 2;
         e_sliderLengthDisplay.innerText = `Length [${e_sliderLength.value}]`;
+
+        e_wordSelect.style.visibility = 'visible';
     }
 }
 
-toggleGenerator('mixword');
+toggleGenerator('pseudoword');
+generateUsername();

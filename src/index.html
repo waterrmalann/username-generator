@@ -52,13 +52,13 @@
                                 <input id="sliderLength" class="slider" type="range" min=3 max=15 value=9>
                             </label>
                             <label>
-                                <input class="checkbox" type="checkbox">Digits
+                                <input class="checkbox" type="checkbox" disabled>Digits
                             </label>
                             <label>
-                                <input class="checkbox" type="checkbox">Adjectives
+                                <input checked id="checkAdjectives" class="checkbox" type="checkbox">Adjectives
                             </label>
                             <select name="words" id="wordSelect">
-                                <option value="words">Nouns</option>
+                                <option value="nouns">Nouns</option>
                                 <option value="colors">Colors</option>
                                 <option value="animals">Animals</option>
                             </select>
@@ -74,6 +74,7 @@
         </div>
 
         <script src="js/gpw.js"></script>
+        <script src="js/mig.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>
