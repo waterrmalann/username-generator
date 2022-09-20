@@ -19,15 +19,33 @@ const e_usernamesCard = document.getElementsByClassName('card-usernames')[0];
 
 const e_wordSelect = document.getElementById('wordSelect');
 const e_checkAdjectives = document.getElementById('checkAdjectives');
+const e_checkDigits = document.getElementById('checkDigits');
+const e_checkCamelCase = document.getElementById('checkCamelCase');
 
 const generationData = {
     adjectives: [],
     animals: [],
     colors: [],
     nouns: [],
-    verbs: []
+    verbs: [],
 }
 
+const numberGenerator = new MIG(1, 9999);
+
+// load all data
+Promise.all([
+    fetch("./assets/data/adjectives.txt").then(x => x.text()),
+    fetch("./assets/data/animals.txt").then(x => x.text()),
+    fetch("./assets/data/colors.txt").then(x => x.text()),
+    fetch("./assets/data/nouns.txt").then(x => x.text()),
+    fetch("./assets/data/verbs.txt").then(x => x.text())
+]).then(([adjectives, animals, colors, nouns, verbs]) => {
+    generationData.adjectives = adjectives.split('\n');
+    generationData.animals = animals.split('\n');
+    generationData.colors = colors.split('\n');
+    generationData.nouns = nouns.split('\n');
+    generationData.verbs = verbs.split('\n');
+});
 
 /**
  * Randomly pick an element from given array.
@@ -46,7 +64,7 @@ function randomChoice(arr) {
 function camelCaseJoin(arr) {
     let _string = arr[0];
     for (let i = 1; i < arr.length; i++) {
-        _string += arr[i].toUpperCase();
+        _string += arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
     }
     return _string;
 }
@@ -64,7 +82,7 @@ function generateMixwordUsername(length, camelCase) {
     }
     if (length > 2)
         _username.push(randomChoice(generationData.verbs));
-    if (length > 1)
+    if (length > 1) {
         if (e_wordSelect.value === 'colors') {
             _username.push(randomChoice(generationData.colors));
         } else if (e_wordSelect.value === 'animals') {
@@ -72,6 +90,12 @@ function generateMixwordUsername(length, camelCase) {
         } else {
             _username.push(randomChoice(generationData.nouns));
         }
+    }
+
+    if (e_checkDigits.checked) {
+        _username.push(numberGenerator.generate().toString());
+    }
+
 
     if (camelCase) {
         return camelCaseJoin(_username);
@@ -81,23 +105,14 @@ function generateMixwordUsername(length, camelCase) {
 }
 
 function generatePseudowordUsername(length) {
-    return GPW.pronounceable(length);
+    let _username = GPW.pronounceable(length);
+    if (e_checkDigits.checked) {
+        let _generatedNum = numberGenerator.generate().toString();
+        _username += _generatedNum;
+        e_sliderLengthDisplay.innerHTML = `Length [${e_sliderLength.value} <span class="tinyred">+ ${_generatedNum.length}</span>]`;
+    }
+    return _username;
 }
-
-Promise.all([
-    fetch("./assets/data/adjectives.txt").then(x => x.text()),
-    fetch("./assets/data/animals.txt").then(x => x.text()),
-    fetch("./assets/data/colors.txt").then(x => x.text()),
-    fetch("./assets/data/nouns.txt").then(x => x.text()),
-    fetch("./assets/data/verbs.txt").then(x => x.text())
-]).then(([adjectives, animals, colors, nouns, verbs]) => {
-    generationData.adjectives = adjectives.split('\n');
-    generationData.animals = animals.split('\n');
-    generationData.colors = colors.split('\n');
-    generationData.nouns = nouns.split('\n');
-    generationData.verbs = verbs.split('\n');
-});
-
 
 let heartedUsernames = [];
 let generatedUsernames = [];
@@ -159,6 +174,12 @@ e_buttonRegenerate.addEventListener('click', () => {
     generateUsername();
 });
 
+e_checkDigits.addEventListener('change', (e) => {
+    if (!e.target.checked) {
+        e_sliderLengthDisplay.innerText = `Length [${e_sliderLength.value}]`;
+    }
+});
+
 e_buttonClipboard.addEventListener('click', () => {
     let _dummy = document.createElement('textarea');
     document.body.appendChild(_dummy);
@@ -176,7 +197,7 @@ function generateUsername() {
         _username = generatePseudowordUsername(e_sliderLength.value);
     }
     else {
-        _username = generateMixwordUsername(e_sliderLength.value);
+        _username = generateMixwordUsername(e_sliderLength.value, e_checkCamelCase.checked);
     }
     e_usernameOutput.innerText = '@' + _username;
     generatedUsernames.push(_username);
@@ -192,7 +213,10 @@ function toggleGenerator(gen) {
         e_sliderLength.value = 8;
         e_sliderLengthDisplay.innerText = `Length [${e_sliderLength.value}]`;
 
+        // To Do: Toggle an invisible class instead.
         e_wordSelect.style.visibility = 'hidden';
+        e_checkAdjectives.parentElement.style.visibility = 'hidden';
+        e_checkCamelCase.parentElement.style.visibility = 'hidden';
     }
     else {
         e_toggleMixword.classList.add('toggle-active');
@@ -200,9 +224,12 @@ function toggleGenerator(gen) {
         e_sliderLength.max = 5;
         e_sliderLength.min = 2;
         e_sliderLength.value = 2;
+        // To Do: "Word Length [xx]"
         e_sliderLengthDisplay.innerText = `Length [${e_sliderLength.value}]`;
 
         e_wordSelect.style.visibility = 'visible';
+        e_checkAdjectives.parentElement.style.visibility = 'visible';
+        e_checkCamelCase.parentElement.style.visibility = 'visible';
     }
 }
 
